@@ -1,0 +1,7 @@
+{
+  "id": "decision-memory",
+  "name": "Decision Memory",
+  "entry": "extension.py",
+  "description": "Adds small project decision memory tools for durable architecture and strategy choices."
+}
+

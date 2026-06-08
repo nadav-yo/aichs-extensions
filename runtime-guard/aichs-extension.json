@@ -1,0 +1,7 @@
+{
+  "id": "runtime-guard",
+  "name": "Runtime Guard",
+  "entry": "extension.py",
+  "description": "Detects repeated tool failures and steers the model away from retry loops."
+}
+

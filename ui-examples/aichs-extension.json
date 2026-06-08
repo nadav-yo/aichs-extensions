@@ -1,0 +1,7 @@
+{
+  "id": "ui-examples",
+  "name": "UI Examples",
+  "entry": "extension.py",
+  "description": "Shows status badges and panels for workspace state and current chat context."
+}
+

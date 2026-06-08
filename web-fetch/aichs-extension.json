@@ -1,0 +1,7 @@
+{
+  "id": "web-fetch",
+  "name": "Web Fetch",
+  "entry": "extension.py",
+  "description": "Adds an approved web_fetch tool for reading public web pages into the model context."
+}
+

@@ -1,0 +1,6 @@
+{
+  "id": "workflow-examples",
+  "name": "Workflow Examples",
+  "entry": "extension.py",
+  "description": "Adds demo workflow helpers: a ping tool, review command, context note, and guardrail hooks."
+}

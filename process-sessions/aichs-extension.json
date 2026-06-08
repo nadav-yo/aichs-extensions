@@ -1,0 +1,7 @@
+{
+  "id": "process-sessions",
+  "name": "Process Sessions",
+  "entry": "extension.py",
+  "description": "Manages named long-running workspace processes through the core process runtime."
+}
+
