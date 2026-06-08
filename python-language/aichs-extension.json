@@ -1,0 +1,11 @@
+{
+  "id": "python-language",
+  "name": "Python Language Support",
+  "entry": "extension.py",
+  "description": "Adds Python syntax diagnostics, symbols, and completion for the file editor.",
+  "language": "python",
+  "dependencies": {
+    "required": [],
+    "optional": ["tree-sitter", "tree-sitter-python"]
+  }
+}

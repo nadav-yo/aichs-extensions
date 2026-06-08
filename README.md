@@ -21,3 +21,18 @@ The app loads both single-file extensions and folder extensions with an
 `extension.py` entrypoint. Aichs itself does not ship these extensions by
 default; they are opt-in examples and helpers.
 
+In current aichs builds, you can also open the Extensions dialog, choose
+**Add**, paste this repository URL, and select the extension folders to install.
+
+## Extensions
+
+| Extension | What it adds |
+|---|---|
+| `python-language` | Python syntax diagnostics, symbols, and completion for the file editor |
+| `runtime-continue` | Runtime continuation and compaction helpers |
+| `runtime-guard` | Retry-loop guardrails for runtime failures |
+| `process-sessions` | Managed process session helpers |
+| `decision-memory` | Project decision memory helpers |
+| `web-fetch` | Web page fetch tool example |
+| `ui-examples` | Status badge and panel examples |
+| `workflow-examples` | Tool, command, context, and hook examples |
