@@ -6,6 +6,6 @@
   "language": "python",
   "dependencies": {
     "required": [],
-    "optional": ["tree-sitter", "tree-sitter-python"]
+    "optional": ["ruff", "tree-sitter", "tree-sitter-python"]
   }
 }
