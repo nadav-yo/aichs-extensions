@@ -28,7 +28,7 @@ In current aichs builds, you can also open the Extensions dialog, choose
 
 | Extension | What it adds |
 |---|---|
-| `python-language` | Python syntax diagnostics, symbols, and completion for the file editor |
+| `python-language` | Python syntax diagnostics, Ruff lint/fix/format support, symbols, and completion |
 | `runtime-continue` | Runtime continuation and compaction helpers |
 | `runtime-guard` | Retry-loop guardrails for runtime failures |
 | `process-sessions` | Managed process session helpers |

@@ -9,6 +9,7 @@ from pathlib import Path
 
 @dataclass
 class Context:
+    cwd: str | None = None
     path: str = "demo.py"
     content: str = ""
     prefix: str = ""
@@ -51,6 +52,8 @@ def test_python_diagnostics_includes_ruff_when_available(monkeypatch):
                 "message": "`os` imported but unused",
                 "location": {"row": 1, "column": 8},
                 "end_location": {"row": 1, "column": 10},
+                "fix": {"applicability": "safe"},
+                "url": "https://docs.astral.sh/ruff/rules/unused-import/",
             }]),
             stderr="",
         )
@@ -69,6 +72,11 @@ def test_python_diagnostics_includes_ruff_when_available(monkeypatch):
         "source": "ruff",
         "code": "F401",
         "message": "`os` imported but unused",
+        "fix_available": True,
+        "fix_safety": "safe",
+        "data": {
+            "url": "https://docs.astral.sh/ruff/rules/unused-import/",
+        },
     }]
 
 
@@ -180,3 +188,6 @@ def test_register_contributes_python_language():
     assert callable(language["diagnostics"])
     assert callable(language["symbols"])
     assert callable(language["completion"])
+    assert callable(language["code_actions"])
+    assert callable(language["apply_code_action"])
+    assert callable(language["format_document"])

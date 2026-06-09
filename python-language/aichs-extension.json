@@ -4,8 +4,8 @@
   "entry": "extension.py",
   "description": "Adds Python syntax diagnostics, symbols, and completion for the file editor.",
   "language": "python",
-  "dependencies": {
-    "required": [],
-    "optional": ["ruff", "tree-sitter", "tree-sitter-python"]
+  "requires": {
+    "executables": ["ruff"],
+    "python": []
   }
 }

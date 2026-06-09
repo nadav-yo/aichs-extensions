@@ -12,8 +12,10 @@ import builtins
 from collections import OrderedDict
 import json
 import keyword
+from pathlib import Path
 import re
 import subprocess
+import tempfile
 
 
 EXTENSION_DESCRIPTION = "Adds Python syntax diagnostics, symbols, and completion for the file editor."
@@ -43,6 +45,9 @@ def register(registry):
         diagnostics=diagnostics,
         symbols=symbols,
         completion=completion,
+        code_actions=code_actions,
+        apply_code_action=apply_code_action,
+        format_document=format_document,
     )
 
 
@@ -50,7 +55,7 @@ def diagnostics(ctx):
     items = []
     _tree, syntax_error = _parse_ast(ctx)
     if syntax_error:
-        items.append(_syntax_diagnostic(ctx, syntax_error))
+        return [_syntax_diagnostic(ctx, syntax_error)]
     items.extend(_ruff_diagnostics(ctx))
     return _dedupe_diagnostics(items)
 
@@ -93,6 +98,62 @@ def completion(ctx):
                 })
 
     return sorted(candidates.values(), key=lambda item: (item["label"].lower(), item["label"]))[:80]
+
+
+def code_actions(ctx):
+    if len(ctx.content or "") > _MAX_RUFF_CHARS:
+        return []
+    if not _has_ruff_diagnostic(ctx):
+        return []
+    if not _has_ruff_fix(ctx, safe_only=True):
+        return []
+    return [{
+        "id": "ruff.fix",
+        "title": "Apply Ruff safe fixes in file",
+        "kind": "quickfix",
+        "source": "ruff",
+        "safe": True,
+        "safety": "safe",
+    }]
+
+
+def apply_code_action(ctx):
+    action_id = str(getattr(ctx, "action_id", "") or "")
+    if action_id == "ruff.fix":
+        return _ruff_fix(ctx)
+    return None
+
+
+def format_document(ctx):
+    content = ctx.content or ""
+    if len(content) > _MAX_RUFF_CHARS:
+        return {"message": "Skipped Ruff format: file is too large."}
+    path = ctx.path or "buffer.py"
+    try:
+        result = subprocess.run(
+            ["ruff", "format", "--stdin-filename", path, "-"],
+            input=content,
+            text=True,
+            capture_output=True,
+            check=False,
+            timeout=_RUFF_TIMEOUT_SECONDS,
+            cwd=ctx.cwd or None,
+        )
+    except FileNotFoundError:
+        return {"message": "Ruff is not available on PATH."}
+    except (subprocess.SubprocessError, OSError) as exc:
+        return {"message": f"Ruff format failed: {exc}"}
+    if result.returncode != 0:
+        output = (result.stderr or result.stdout or "").strip()
+        message = "Ruff format failed."
+        if output:
+            message = f"{message} {output.splitlines()[0]}"
+        return {"message": message}
+
+    formatted = result.stdout
+    if formatted == content:
+        return {"content": formatted, "message": "Ruff format made no changes."}
+    return {"content": formatted, "message": "Formatted with Ruff."}
 
 
 class _SymbolVisitor(ast.NodeVisitor):
@@ -225,6 +286,13 @@ def _syntax_diagnostic(ctx, exc: SyntaxError) -> dict:
 
 
 def _ruff_diagnostics(ctx):
+    return [
+        _ruff_item_to_diagnostic(item, ctx.path or "buffer.py")
+        for item in _ruff_raw_diagnostics(ctx)
+    ]
+
+
+def _ruff_raw_diagnostics(ctx):
     if len(ctx.content or "") > _MAX_RUFF_CHARS:
         return []
     path = ctx.path or "buffer.py"
@@ -243,6 +311,7 @@ def _ruff_diagnostics(ctx):
             capture_output=True,
             check=False,
             timeout=_RUFF_TIMEOUT_SECONDS,
+            cwd=ctx.cwd or None,
         )
     except (FileNotFoundError, subprocess.SubprocessError, OSError):
         return []
@@ -254,16 +323,119 @@ def _ruff_diagnostics(ctx):
         return []
     if not isinstance(raw_items, list):
         return []
-    return [
-        _ruff_item_to_diagnostic(item, path)
-        for item in raw_items
-        if isinstance(item, dict)
-    ]
+    return [item for item in raw_items if isinstance(item, dict)]
+
+
+def _ruff_fix(ctx):
+    content = ctx.content or ""
+    if len(content) > _MAX_RUFF_CHARS:
+        return {"message": "Skipped Ruff fix: file is too large."}
+    if not _has_ruff_fix(ctx, safe_only=True):
+        if _has_ruff_fix(ctx, safe_only=False):
+            return {"message": "Ruff found only unsafe fixes for this diagnostic."}
+        return {"message": "Ruff has no fix for this diagnostic."}
+
+    temp_path = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            "w",
+            encoding="utf-8",
+            suffix=Path(ctx.path or "buffer.py").suffix or ".py",
+            prefix=".aichs-ruff-",
+            delete=False,
+        ) as handle:
+            temp_path = Path(handle.name)
+            handle.write(content)
+
+        result = subprocess.run(
+            ["ruff", "check", "--fix", "--exit-zero", str(temp_path)],
+            text=True,
+            capture_output=True,
+            check=False,
+            timeout=_RUFF_TIMEOUT_SECONDS,
+            cwd=ctx.cwd or None,
+        )
+        if result.returncode not in (0, 1):
+            output = (result.stderr or result.stdout or "").strip()
+            message = "Ruff fix failed."
+            if output:
+                message = f"{message} {output.splitlines()[0]}"
+            return {"message": message}
+
+        fixed = temp_path.read_text(encoding="utf-8")
+        if fixed == content:
+            return {"message": "Ruff had no safe fixes to apply."}
+        return {"content": fixed, "message": "Applied Ruff safe fixes."}
+    except FileNotFoundError:
+        return {"message": "Ruff is not available on PATH."}
+    except (subprocess.SubprocessError, OSError) as exc:
+        return {"message": f"Ruff fix failed: {exc}"}
+    finally:
+        if temp_path is not None:
+            try:
+                temp_path.unlink()
+            except OSError:
+                pass
+
+
+def _has_ruff_diagnostic(ctx) -> bool:
+    for diagnostic in getattr(ctx, "diagnostics", ()) or ():
+        if isinstance(diagnostic, dict):
+            if diagnostic.get("source") == "ruff":
+                return True
+            continue
+        if getattr(diagnostic, "source", "") == "ruff":
+            return True
+    return False
+
+
+def _has_ruff_fix(ctx, *, safe_only: bool) -> bool:
+    selected = _selected_ruff_diagnostic_keys(ctx)
+    for item in _ruff_raw_diagnostics(ctx):
+        if selected and _ruff_item_key(item) not in selected:
+            continue
+        fix = item.get("fix")
+        if not isinstance(fix, dict):
+            continue
+        if not safe_only:
+            return True
+        if str(fix.get("applicability") or "").lower() == "safe":
+            return True
+    return False
+
+
+def _selected_ruff_diagnostic_keys(ctx) -> set[tuple[str, int]]:
+    keys = set()
+    for diagnostic in getattr(ctx, "diagnostics", ()) or ():
+        if isinstance(diagnostic, dict):
+            source = diagnostic.get("source")
+            code = diagnostic.get("code")
+            line = diagnostic.get("line")
+        else:
+            source = getattr(diagnostic, "source", "")
+            code = getattr(diagnostic, "code", "")
+            line = getattr(diagnostic, "line", None)
+        if source != "ruff":
+            continue
+        try:
+            keys.add((str(code or ""), int(line)))
+        except (TypeError, ValueError):
+            continue
+    return keys
+
+
+def _ruff_item_key(item: dict) -> tuple[str, int]:
+    location = item.get("location") if isinstance(item.get("location"), dict) else {}
+    return (str(item.get("code") or ""), _positive_int(location.get("row"), 1))
 
 
 def _ruff_item_to_diagnostic(item: dict, path: str) -> dict:
     location = item.get("location") if isinstance(item.get("location"), dict) else {}
     end_location = item.get("end_location") if isinstance(item.get("end_location"), dict) else {}
+    fix = item.get("fix") if isinstance(item.get("fix"), dict) else {}
+    fix_safety = str(fix.get("applicability") or "").lower()
+    if fix_safety not in ("safe", "unsafe"):
+        fix_safety = ""
     return {
         "path": str(item.get("filename") or path),
         "line": _positive_int(location.get("row"), 1),
@@ -274,6 +446,11 @@ def _ruff_item_to_diagnostic(item: dict, path: str) -> dict:
         "source": "ruff",
         "code": str(item.get("code") or ""),
         "message": str(item.get("message") or "Ruff diagnostic"),
+        "fix_available": bool(fix),
+        "fix_safety": fix_safety,
+        "data": {
+            "url": str(item.get("url") or ""),
+        },
     }
 
 
