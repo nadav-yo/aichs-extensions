@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "tools": true,
+    "extension_storage": true,
+    "context": true,
+    "hooks": true,
+    "ui": true
+  },
+  "description": "Stores compact handoff notes and spools large tool outputs to extension artifacts.",
+  "name": "Context Resilience",
+  "entry": "extension.py",
+  "id": "context-resilience"
+}
+

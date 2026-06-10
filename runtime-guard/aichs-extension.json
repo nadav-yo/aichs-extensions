@@ -1,7 +1,12 @@
 {
-  "id": "runtime-guard",
+  "permissions": {
+    "commands": true,
+    "ui": true,
+    "hooks": true
+  },
+  "description": "Detects repeated tool failures and steers the model away from retry loops.",
   "name": "Runtime Guard",
   "entry": "extension.py",
-  "description": "Detects repeated tool failures and steers the model away from retry loops."
+  "id": "runtime-guard"
 }
 

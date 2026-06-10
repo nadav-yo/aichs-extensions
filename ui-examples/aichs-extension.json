@@ -1,7 +1,11 @@
 {
-  "id": "ui-examples",
+  "permissions": {
+    "ui": true,
+    "workspace_read": true
+  },
+  "description": "Shows status badges and panels for workspace state and current chat context.",
   "name": "UI Examples",
   "entry": "extension.py",
-  "description": "Shows status badges and panels for workspace state and current chat context."
+  "id": "ui-examples"
 }
 

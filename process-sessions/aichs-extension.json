@@ -1,7 +1,15 @@
 {
-  "id": "process-sessions",
+  "permissions": {
+    "ui": true,
+    "extension_storage": true,
+    "processes": true,
+    "workspace_read": true,
+    "tools": true,
+    "commands": true
+  },
+  "description": "Manages named long-running workspace processes through the core process runtime.",
   "name": "Process Sessions",
   "entry": "extension.py",
-  "description": "Manages named long-running workspace processes through the core process runtime."
+  "id": "process-sessions"
 }
 

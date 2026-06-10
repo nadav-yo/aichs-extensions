@@ -1,7 +1,12 @@
 {
-  "id": "decision-memory",
+  "permissions": {
+    "tools": true,
+    "context": true,
+    "extension_storage": true
+  },
+  "description": "Adds small project decision memory tools for durable architecture and strategy choices.",
   "name": "Decision Memory",
   "entry": "extension.py",
-  "description": "Adds small project decision memory tools for durable architecture and strategy choices."
+  "id": "decision-memory"
 }
 

@@ -1,7 +1,13 @@
 {
-  "id": "runtime-continue",
+  "permissions": {
+    "commands": true,
+    "ui": true,
+    "hooks": true,
+    "extension_storage": true
+  },
+  "description": "Demonstrates runtime continuation: compacting, validating a handoff, and resuming the active task.",
   "name": "Runtime Continue",
   "entry": "extension.py",
-  "description": "Demonstrates runtime continuation: compacting, validating a handoff, and resuming the active task."
+  "id": "runtime-continue"
 }
 

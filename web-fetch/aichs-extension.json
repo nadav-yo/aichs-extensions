@@ -1,7 +1,11 @@
 {
-  "id": "web-fetch",
+  "permissions": {
+    "tools": true,
+    "network": true
+  },
+  "description": "Adds an approved web_fetch tool for reading public web pages into the model context.",
   "name": "Web Fetch",
   "entry": "extension.py",
-  "description": "Adds an approved web_fetch tool for reading public web pages into the model context."
+  "id": "web-fetch"
 }
 

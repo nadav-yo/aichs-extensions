@@ -1,6 +1,13 @@
 {
-  "id": "workflow-examples",
+  "permissions": {
+    "tools": true,
+    "commands": true,
+    "context": true,
+    "hooks": true
+  },
+  "description": "Adds demo workflow helpers: a ping tool, review command, context note, and guardrail hooks.",
   "name": "Workflow Examples",
   "entry": "extension.py",
-  "description": "Adds demo workflow helpers: a ping tool, review command, context note, and guardrail hooks."
+  "id": "workflow-examples"
 }
+

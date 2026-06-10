@@ -1,11 +1,18 @@
 {
-  "id": "python-language",
   "name": "Python Language Support",
-  "entry": "extension.py",
-  "description": "Adds Python syntax diagnostics, symbols, and completion for the file editor.",
+  "permissions": {
+    "language": true,
+    "processes": true
+  },
   "language": "python",
   "requires": {
-    "executables": ["ruff"],
-    "python": []
-  }
+    "python": [],
+    "executables": [
+      "ruff"
+    ]
+  },
+  "description": "Adds Python syntax diagnostics, symbols, and completion for the file editor.",
+  "entry": "extension.py",
+  "id": "python-language"
 }
+

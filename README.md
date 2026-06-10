@@ -32,7 +32,9 @@ In current aichs builds, you can also open the Extensions dialog, choose
 | `runtime-continue` | Runtime continuation and compaction helpers |
 | `runtime-guard` | Retry-loop guardrails for runtime failures |
 | `process-sessions` | Managed process session helpers |
+| `context-resilience` | Compact handoff notes and large-output artifact spooling |
 | `decision-memory` | Project decision memory helpers |
 | `web-fetch` | Web page fetch tool example |
 | `ui-examples` | Status badge and panel examples |
 | `workflow-examples` | Tool, command, context, and hook examples |
+
