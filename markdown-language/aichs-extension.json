@@ -1,0 +1,17 @@
+{
+  "name": "Markdown Language Support",
+  "permissions": {
+    "language": true,
+    "processes": true
+  },
+  "language": "markdown",
+  "requires": {
+    "python": [],
+    "executables": [
+      "pymarkdown"
+    ]
+  },
+  "description": "Adds Markdown diagnostics, headings, and completion for the file editor.",
+  "entry": "extension.py",
+  "id": "markdown-language"
+}
