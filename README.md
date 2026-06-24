@@ -34,7 +34,10 @@ In current aichs builds, you can also open the Extensions dialog, choose
 | `process-sessions` | Managed process session helpers |
 | `context-resilience` | Compact handoff notes and large-output artifact spooling |
 | `decision-memory` | Project decision memory helpers |
+| `canvas-briefing` | Canvas context briefing example for graph chat and run agents |
+| `canvas-notes` | Canvas-only note tools backed by extension storage |
 | `web-fetch` | Web page fetch tool example |
 | `ui-examples` | Status badge and panel examples |
 | `workflow-examples` | Tool, command, context, and hook examples |
+
 

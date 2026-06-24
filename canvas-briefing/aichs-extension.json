@@ -1,0 +1,7 @@
+{
+  "name": "Canvas Briefing",
+  "description": "Example canvas context provider for graph chat and node runs.",
+  "permissions": {
+    "context": true
+  }
+}

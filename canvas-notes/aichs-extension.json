@@ -1,0 +1,8 @@
+{
+  "name": "Canvas Notes",
+  "description": "Example canvas-only tools with extension storage.",
+  "permissions": {
+    "tools": true,
+    "extension_storage": true
+  }
+}
